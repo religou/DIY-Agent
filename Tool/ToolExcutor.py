@@ -1,11 +1,16 @@
-from typing import Dict
-from Search import search
+from typing import Any, Callable, Dict
+
+try:
+    from .Search import search
+except ImportError:
+    from Search import search
+
 
 class ToolExcutor:
     def __init__(self):
-        self.tools: Dict[str, Dict[str, any]] = {}
+        self.tools: Dict[str, Dict[str, Any]] = {}
 
-    def registerTool(self, name: str, description: str, func: callable):
+    def registerTool(self, name: str, description: str, func: Callable[[str], str]) -> None:
         if name in self.tools:
             print(f"Warning: Tool {name} already exists. Overwriting.")
         self.tools[name] = {
@@ -14,7 +19,7 @@ class ToolExcutor:
         }
         print(f"Tool {name} has been registerd.")
 
-    def getTool(self, name: str) -> callable:
+    def getTool(self, name: str) -> Callable[[str], str]:
         if name in self.tools:
             return self.tools[name]["func"]
         else:

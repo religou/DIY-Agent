@@ -1,4 +1,11 @@
+import os
 import re
+import sys
+
+# 允许脚本既可以通过 `python Agent/ReActAgent.py` 直接运行，
+# 也可以通过 `python -m Agent.ReActAgent` 以模块方式运行。
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from Model.HelloAgentsLLM import HelloAgentsLLM
 from Tool.ToolExcutor import ToolExcutor
 

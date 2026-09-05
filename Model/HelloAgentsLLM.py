@@ -46,6 +46,46 @@ class HelloAgentsLLM:
             print(f"调用模型时出错: {e}")
             return None
 
+    # 自动检查 LLM Provider
+    def _auto_detect_provider(self, api_key: Optional[str], base_url: Optional[str]) -> str:
+
+        if os.getenv("SILICONFLOW_API_KEY"): return "siliconflow"
+        if os.getenv("MODELSCOPE_API_KEY"): return "modelscope"
+        if os.getenv("OPENAI_API_KEY"): return "openai"
+        if os.getenv("ZHIPU_API_KEY"): return "zhipu"
+
+        actual_api_key = api_key or os.getenv("LLM_API_KEY")
+        actual_base_url = base_url or os.getenv("LLM_BASE_URL")
+
+        if actual_api_key:
+            if actual_api_key.startswith("sk-"): return "siliconflow"
+            if actual_api_key.startswith("ms-"): return "modelscope"
+
+        if actual_base_url:
+            base_url_lower = actual_base_url.lower()
+            if "siliconflow.cn" in base_url_lower: return "siliconflow"
+            if "modelscope.cn" in base_url_lower: return "modelscope"
+            if "bigmodel.cn" in base_url_lower: return "zhipu"
+            if "localhost" in base_url_lower:
+                if ":11434" in base_url_lower:
+                    return "ollma"
+                if ":8000" in base_url_lower:
+                    return "vllm"
+                return "local"
+        return "auto"
+
+    def _resolve_credentials(self, api_key: Optional[str], base_url: Optional[str]) -> tuple:
+        if self.provider == "openai":
+            resolved_api_key = api_key or os.getenv("OPENAI_API_KEY") or os.getenv("LLM_API_KEY")
+            resolved_base_url = base_url or os.getenv("LLM_BASE_URL") or "https://api.openai.com/v1"
+            return resolved_api_key, resolved_base_url
+
+        elif self.provider == "modelscope":
+            resolved_api_key = api_key or os.getenv("MODELSCOPE_API_KEY") or os.getenv("LLM_API_KEY")
+            resolved_base_url = base_url or os.getenv("LLM_BASE_URL") or "https://api-inference.modelscope.cn/v1/"
+            return resolved_api_key, resolved_base_url
+
+
 if __name__ == "__main__":
     try:
         llm = HelloAgentsLLM()

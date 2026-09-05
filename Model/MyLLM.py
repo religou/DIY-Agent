@@ -1,7 +1,15 @@
+import sys, os
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
 import os
 from typing import Optional
 from openai import OpenAI
-from .HelloAgentsLLM import HelloAgentsLLM
+from Model.HelloAgentsLLM import HelloAgentsLLM
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class MyLLM(HelloAgentsLLM):
     def __init__(self, model: Optional[str] = None, api_key: Optional[str] = None, base_url: Optional[str] = None, provider: Optional[str] = "auto", **kwargs):
@@ -19,7 +27,17 @@ class MyLLM(HelloAgentsLLM):
             self.max_token = kwargs.get("max_token")
             self.timeout = kwargs.get("timeout", 60)
 
-            self._client = OpenAI(api_key = self.api_key, base_url = self.base_url, timeout = self.timeout)
+            self.client = OpenAI(api_key = self.api_key, base_url = self.base_url, timeout = self.timeout)
             
         else:
             super().__init__(model = model, apiKey = api_key, baseURL = base_url)
+
+if __name__ == "__main__":
+    llm = MyLLM(provider = "ModelScope")
+
+    message = [{"role": "user", "content": "介绍你自己"}]
+
+    response = llm.think(messages = message)
+
+    for chunk in response:
+        pass

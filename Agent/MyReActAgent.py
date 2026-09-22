@@ -50,7 +50,6 @@ class MyReActAgent(ReActAgent):
         print(f"✅ {name} 初始化完成，最大步数: {max_steps}")
 
     def run(self, input_text: str, **kwargs) -> str:
-
         self.current_history = []
         current_step = 0
 
